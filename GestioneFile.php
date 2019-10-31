@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class for file management
+ * Classe per operazioni su file
  *
- * @author Mattepuffo
- * @since 2017-06-13
- * @version 1.6
+ * @author Matteo Ferrone
+ * @since 2019-10-30
+ * @version 1.7
  */
 class GestioneFile {
 
@@ -41,7 +41,10 @@ class GestioneFile {
      * 'ppt' => 'application/vnd.ms-powerpoint',
      * 'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
      * 'xls' => 'application/vnd.ms-excel',
-     * 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+     * 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+     * 'png' => 'image/png',
+     * 'jpeg' => 'image/jpeg',
+     * 'jpg' => 'image/jpg'
      * );
      * $gestioneFile = new GestioneFile();
      * echo $gestioneFile->uploadFile('../../FILE_UPLOADS/', $fileTmpName, $fileName, $fileSize, $fileType, $typeArray, $maxSize, $fileName);
@@ -60,18 +63,61 @@ class GestioneFile {
         $fileSizeMB = $fileSize / 1024;
         if (is_uploaded_file($fileTmpName)) {
             if (!in_array($fileType, $typeArray)) {
-                return '<h3 class="error">Il file non è tra quelli ammessi</h3>';
+                http_response_code(404);
+                return json_encode(
+                    array(
+                        "res" => "ko",
+                        "message" => "Il file non è tra quelli ammessi!",
+                        "nome_file" => $nome,
+                        "tipo" => ""
+                    )
+                );
             } elseif ($fileSizeMB > $maxSize) {
-                return '<h3 class="error">Il file è troppo grande</h3>';
+                http_response_code(404);
+                return json_encode(
+                    array(
+                        "res" => "ko",
+                        "message" => "Il file è troppo grande!",
+                        "nome_file" => $fileName,
+                        "tipo" => ""
+                    )
+                );
+
             } else {
+//                $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+//                if (move_uploaded_file($fileTmpName, $dirUpload . $nome . '.' . $ext)) {
                 if (move_uploaded_file($fileTmpName, $dirUpload . $nome)) {
-                    return '<h3>File caricato ' . $dirUpload . $nome . '</h3>';
+                    http_response_code(200);
+                    return json_encode(
+                        array(
+                            "res" => "ok",
+                            "message" => "File caricato ' . $dirUpload . $nome . '!",
+                            "nome_file" => $nome,
+                            "tipo" => mime_content_type($dirUpload . $nome)
+                        )
+                    );
                 } else {
-                    return '<h3 class="error">Impossibile caricare il file ' . $fileName . '</h3>';
+                    http_response_code(404);
+                    return json_encode(
+                        array(
+                            "res" => "ko",
+                            "message" => "Impossibile caricare il file ' . $fileName . '!",
+                            "nome_file" => $fileName,
+                            "tipo" => ""
+                        )
+                    );
                 }
             }
         } else {
-            return '<h3 class="error">Si è verficato un errore o non è stato inviato nessun file</h3>';
+            http_response_code(404);
+            return json_encode(
+                array(
+                    "res" => "ko",
+                    "message" => "Si è verficato un errore o non è stato inviato nessun file!",
+                    "nome_file" => $fileName,
+                    "tipo" => ""
+                )
+            );
         }
     }
 
