@@ -5,7 +5,7 @@
  *
  * @author Matteo Ferrone
  * @since 2019-10-30
- * @version 1.7
+ * @version 1.8
  */
 class GestioneFile {
 
@@ -192,6 +192,30 @@ class GestioneFile {
                         'data' => date('d-m-Y', $dir->getMTime()),
                         'size' => number_format(($dir->getSize() / 1048576), 0, ',', '.') . ' MB',
                         'ext' => pathinfo($dir->getFilename(), PATHINFO_EXTENSION)
+                    );
+                }
+            }
+        }
+        sort($fileArray);
+        return $fileArray;
+    }
+
+    /**
+     * List only directories
+     *
+     * @param $directory
+     * @return array
+     * @since 1.8
+     */
+    public function getDirs($directory) {
+        if (is_dir($directory)) {
+            $iterator = new DirectoryIterator($directory);
+            $fileArray = array();
+            foreach ($iterator as $dir) {
+                if ($dir->isDir() && $dir->getFilename() != '.' && $dir->getFilename() != '..') {
+                    $fileArray[] = array(
+                        'nome' => $dir->getFilename(),
+                        'data' => date('d-m-Y', $dir->getMTime())
                     );
                 }
             }
