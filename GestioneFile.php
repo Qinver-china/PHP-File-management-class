@@ -4,8 +4,8 @@
  * Classe per operazioni su file
  *
  * @author Matteo Ferrone
- * @since 2019-10-30
- * @version 1.8
+ * @since 2020-03-05
+ * @version 1.9
  */
 class GestioneFile {
 
@@ -124,21 +124,26 @@ class GestioneFile {
     /**
      * Open a file
      *
-     * @param string $file File with path
-     * @return array File content
+     * @param $file
+     * @param bool $doSort
+     * @return array
      */
-    public function openFile($file) {
+    public function openFile($file, $doSort = false) {
         $f = new SplFileInfo($file);
         $result = array();
         if ($f->isFile()) {
             $openFile = $f->openFile('r');
             while (!$openFile->eof()) {
-                array_push($result, strtoupper($openFile->fgets()));
+                array_push($result, $openFile->fgets());
             }
         } else {
             array_push($result, 'Il file ' . $f->getBasename() . ' non esiste!');
         }
-        sort($result);
+
+        if ($doSort) {
+            sort($result);
+        }
+
         return $result;
     }
 
