@@ -128,7 +128,7 @@ class GestioneFile {
      * @param bool $doSort
      * @return array
      */
-    public function openFile($file, $doSort = false) {
+    public function openFile($file, $doSort = true) {
         $f = new SplFileInfo($file);
         $result = array();
         if ($f->isFile()) {
