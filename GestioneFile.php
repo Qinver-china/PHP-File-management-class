@@ -4,8 +4,7 @@
  * Classe per operazioni su file
  *
  * @author Matteo Ferrone
- * @since 2020-03-05
- * @version 1.9
+ * @version 1.9.1
  */
 class GestioneFile {
 
@@ -274,6 +273,36 @@ class GestioneFile {
      */
     public function getExtension($file) {
         return pathinfo($file['extension']);
+    }
+
+    /**
+     * Merge images side by side
+     *
+     * @param $images
+     * @param $path
+     * @param $finalName
+     */
+    public function mergeImagesSideBySide($images, $path, $finalName) {
+        $mw = 0;
+        foreach ($images as $image) {
+            list($iw) = getimagesize($path . $image);
+            $mw += $iw;
+        }
+
+        $mergedImage = imagecreatetruecolor($mw, 800);
+        imagealphablending($mergedImage, false);
+        imagesavealpha($mergedImage, true);
+
+        $posX = 0;
+        foreach ($images as $image) {
+            list($iw, $ih) = getimagesize($path . $image);
+            $img = imagecreatefromjpeg($path . $image);
+            imagecopy($mergedImage, $img, $posX, 0, 0, 0, $iw, $ih);
+            $posX += $iw;
+        }
+
+        imagejpeg($mergedImage, $path . '/' . $finalName);
+        imagedestroy($mergedImage);
     }
 
 }
